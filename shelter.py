@@ -1,24 +1,43 @@
 from dataclasses import dataclass, field
+# from __future__ import annotations # CLASS "Animal" HAVE ARGUMENT "responsible: Employee" | BUT CLASS "Employee" BEING CREATED AFTER CLASS "Animal"
 
-#=========================== 
-#=========ANIMAL============
-#=========================== 
+# ====================
+# =====ANIMAL=========
+# ====================
 
 @dataclass
 class Animal:
-    """ MAKE SOUND | FEEED | INFO """
+    """ MAKE_SOUND | FEED """
+
     name: str
     age: int
     species: str
     is_hungry: bool = True
-    responsible: Employee | None = None
+
+    responsible: Employee | None = field( 
+        default=None,
+        repr=False # ANIMAL HAVE RESPONSIBLE | BUT RESPONSIBLE HAVE ANIMAL LIST = RECURSION -> rep=False
+        )
 
     def __str__(self) -> str:
         is_hungry_text = 'Animal fed' if not self.is_hungry else 'Animal hungry'
-        return f'{self.name} | Species: {self.species} | Age: {self.age} | {is_hungry_text} | Responsible: {self.responsible.name if self.responsible else self.responsible}' # responsible can take value NONE
 
-    def make_sound(self):
-        match self.species:
+        responsible_name = (
+            self.responsible.name
+            if self.responsible
+            else 'No responsible employee'  # RESPONSIBLE CAN TAKE VALUE "None"
+            )
+        
+        return (
+            f'{self.name} |'
+            f'Species: {self.species} |'
+            f'Age: {self.age} |'
+            f'{is_hungry_text} | '
+            f'Responsible: {responsible_name}'
+            )
+
+    def make_sound(self) -> None: 
+        match self.species.lower(): # "Dog" or "DOG" -> "dog"
             case 'dog':
                 print('Woof-Woof')
             case 'cat':
@@ -26,102 +45,127 @@ class Animal:
             case _:
                 print('This animal makes an unknown sound')
     
-    def feed(self):
+    def feed(self) -> bool: # SUCCESSFUL -> "True" | FAILED -> "False"
         if not self.is_hungry:
-            print('Animal not hungry')
-        else:
-            print(f'{self.name} fed')
-            self.is_hungry = False
+            print(f'{self.name} is not hungry') 
+            return False
+        
+        self.is_hungry = False
+        print(f'{self.name} has been fed')
+        return True
 
-#=========================== 
-#=========EMPLOYEE==========
-#=========================== 
+# ====================
+# =====EMPLOYEE=======
+# ====================
 
 @dataclass
 class Employee:
-    """ ADD | FEED ALL | SHOW | INFO """
+    """ ADD_ANIMAL | FEED_ALL | SHOW_ANIMALS """
+
     name: str
     position: str
-    animals: list = field(default_factory=list)
+
+    animals: list[Animal] = field( # LIST "animals" CAN TAKE ONLY VALUE CLASS "Animal" -> list[Animal]
+        default_factory=list 
+        ) 
 
     def __str__(self) -> str:
-        return f'{self.name } | Animals in care: {len(self.animals)}'
+        return (
+                f'{self.name } | ' 
+                f'Position: {self.position} | '
+                f'Animals in care: {len(self.animals)}'
+                )
 
-    def add_animal(self, animal: Animal): # ADD ANIMAL TO EMPLOYEE'S LIST
+    def add_animal(self, animal: Animal) -> bool : # SUCCESSFUL -> "True" | FAILED -> "False"
         if animal.responsible:
-            print('This animal already has an owner')
-        else:
-            self.animals.append(animal)
-            animal.responsible = self
+            return False
 
-    def feed_all(self): # FEED ALL FROM EMPLOYEE'S LIST
-        if self.animals:
-            for animal in self.animals:
-                animal.feed()
-            print(f'All {self.name}\'s animals fed')
-        else:
+        self.animals.append(animal)
+        animal.responsible = self
+        print(f'{animal.name} now has a new owner - {self.name}')
+        return True
+
+    def feed_all(self) -> bool: # SUCCESSFUL -> "True" | FAILED -> "False"
+        if not self.animals:
+            return False
+        
+        for animal in self.animals:
+            animal.feed()
+
+        print(f'All {self.name}\'s animals fed')
+        return True
+
+
+    def show_animals(self) -> None: # EARLY RETURN ⬇
+        if not self.animals:
             print('The employee doesn\'t have animals')
-
-    def show_animals(self): # SHOW ALL FROM EMPLOYEE'S LIST
+            return
+        
         print(f'{self.name}\'s animals:')
-        if self.animals:
-            for index, animal in enumerate(self.animals, start=1):
-                print(f'{index}. {animal.info()}')
-        else:
-            print('The employee doesn\'t have animals')
+        for index, animal in enumerate(self.animals, start=1):
+            print(f'{index}. {animal}')
 
-#=========================== 
-#=========SHELTER===========
-#=========================== 
 
+# ====================
+# =====SHELTER========
+# ====================
+        
 @dataclass
 class Shelter:
-    """ FEED | ADD | FIND | SHOW | INFO """
+    """ ADD_ANIMAL or EMPLOYEE | FIND_ANIMAL | SHOW_ANIMALS or EMPLOYEE"""
+
     name: str
-    animals: list = field(default_factory=list)
-    employees: list = field(default_factory=list)
+
+    animals: list[Animal] = field(
+        default_factory=list, # LIST "animals" CAN TAKE ONLY VALUE CLASS "Animal" -> list[Animal]
+        repr=False # PROTECTION FOR LARGE LIST
+        ) 
+    
+    employees: list[Employee] = field(
+        default_factory=list, # LIST "employees" CAN TAKE ONLY VALUE CLASS "Employee" -> list[Employee]
+        repr=False # PROTECTION FOR LARGE LIST
+        )  
 
     def __str__(self) -> str:
-        return f'{self.name} | Number of animal: {len(self.animals)} | Number of employees: {len(self.employees)}'
+        return (
+                f'{self.name} | '
+                f'Number of animal: {len(self.animals)} | '
+                f'Number of employees: {len(self.employees)}'
+                )
 
-    def feed_all(self): # FEED ALL FROM LIST OF ANIMAL
-        if self.animals:
-            for animal in self.animals:
-                animal.feed()
-            print(f'All animals from {self.name} fed')
-        else:
-            print('There are no animals in the shelter')
-
-    def add_animal(self, animal: Animal): # ADD ANIMAL TO SHELTER LIST
+    def add_animal(self, animal: Animal):
         self.animals.append(animal)
 
-    def add_employee(self, employee): # ADD EMPLOYEE TO SHELTER LIST    
+    def add_employee(self, employee):
         self.employees.append(employee)
 
-    def find_animal(self, name: str) -> Animal | None: # FIND ANIMAL IN SHELTER LIST
+    def find_animal(self, name: str) -> bool: # SUCCESSFUL -> "True" | FAILED -> "False"
+        found = False
+    
         for animal in self.animals:
-            if name == animal.name:
-                print('Match found!')
-                return animal
-        else:
-            print('No matches found')
-        
-    def show_animals(self): # SHOW ALL ANIMALS FROM SHELTER LIST
-        if self.animals:
-            for index, animal in enumerate(self.animals, start=1):
-                print(f'{index}. {animal.info()}')
-        else:
+            if name.lower() == animal.name.lower():
+                print(animal)
+                found = True
+
+        if not found:
+            print('No match found')
+
+        return found
+            
+    def show_animals(self): # EARLY RETURN ⬇
+        if not self.animals:
             print(f'There are no animals at the {self.name}')
+            return 
 
-    def show_employees(self): # SHOW ALL EMPLOYEE FROM SHELTER LIST
-        if self.employees:
-            print(self.name)
-            for index, employee in enumerate(self.employees, start=1):
-                print(f'{index}. {employee.info()}')
-        else:
+        print(f'{self.name} animals:')
+        for index, animal in enumerate(self.animals, start=1):
+            print(f'{index}. {animal}')
+
+    def show_employees(self) -> None: # EARLY RETURN ⬇
+        if not self.employees:
             print(f'There are no staff at the {self.name}')
-
-def main()
-
-if __name__ == '__main__':
-    main()
+            return 
+        
+        print(f'{self.name} employees:')
+        for index, employee in enumerate(self.employees, start=1):
+            print(f'{index}. {employee}')
