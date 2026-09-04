@@ -124,7 +124,7 @@ class Shelter:
     employees: list[Employee] = field(
         default_factory=list, # LIST "employees" CAN TAKE ONLY VALUE CLASS "Employee" -> list[Employee]
         repr=False # PROTECTION FOR LARGE LIST
-        )  
+        )
 
     def __str__(self) -> str:
         return (
@@ -133,10 +133,10 @@ class Shelter:
                 f'Number of employees: {len(self.employees)}'
                 )
 
-    def add_animal(self, animal: Animal):
+    def add_animal(self, animal: Animal) -> None:
         self.animals.append(animal)
 
-    def add_employee(self, employee):
+    def add_employee(self, employee) -> None:
         self.employees.append(employee)
 
     def find_animal(self, name: str) -> bool: # SUCCESSFUL -> "True" | FAILED -> "False"
@@ -152,7 +152,7 @@ class Shelter:
 
         return found
             
-    def show_animals(self): # EARLY RETURN ⬇
+    def show_animals(self) -> None: # EARLY RETURN ⬇
         if not self.animals:
             print(f'There are no animals at the {self.name}')
             return 
