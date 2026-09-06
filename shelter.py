@@ -29,9 +29,9 @@ class Animal:
             )
         
         return (
-            f'{self.name} |'
-            f'Species: {self.species} |'
-            f'Age: {self.age} |'
+            f'{self.name} | '
+            f'Species: {self.species} | '
+            f'Age: {self.age} | '
             f'{is_hungry_text} | '
             f'Responsible: {responsible_name}'
             )
@@ -105,7 +105,6 @@ class Employee:
         for index, animal in enumerate(self.animals, start=1):
             print(f'{index}. {animal}')
 
-
 # ====================
 # =====SHELTER========
 # ====================
@@ -127,10 +126,12 @@ class Shelter:
         )
 
     def __str__(self) -> str:
+        # len_decore = 25+len(self.employees)+len(self.animals) | IN FUTURE FOR BIG COUNT OF ANIMAL or EMPLOYEE
         return (
-                f'{self.name} | '
-                f'Number of animal: {len(self.animals)} | '
-                f'Number of employees: {len(self.employees)}'
+                f'{self.name:=^25} \n'
+                f'Animals: {len(self.animals)} | '
+                f'Employees: {len(self.employees)} \n'
+                f'{'='*25}'
                 )
 
     def add_animal(self, animal: Animal) -> None:
@@ -142,9 +143,9 @@ class Shelter:
     def find_animal(self, name: str) -> bool: # SUCCESSFUL -> "True" | FAILED -> "False"
         found = False
     
-        for animal in self.animals:
+        for index, animal in enumerate(self.animals, start=1):
             if name.lower() == animal.name.lower():
-                print(animal)
+                print(f'{index}. {animal}')
                 found = True
 
         if not found:
@@ -165,7 +166,128 @@ class Shelter:
         if not self.employees:
             print(f'There are no staff at the {self.name}')
             return 
-        
+      
         print(f'{self.name} employees:')
         for index, employee in enumerate(self.employees, start=1):
             print(f'{index}. {employee}')
+
+# ==================== 
+# ======MENU==========
+# ====================
+
+class Menu():
+    def __init__(self, shelter: Shelter):
+        self.shelter = shelter
+        self.main_menu(self.shelter)
+
+    def main_menu(self, shelter: Shelter):
+        while True:
+            print(
+                f'{'MENU':=^20} \n'
+                '1. My shelter \n'
+                '2. Exit'
+                )
+
+            choice = int(input())
+            match choice:
+                case 1:
+                    self.shelter_menu(shelter)
+                case 2:
+                    exit()
+                case _:
+                    print('Unknown command')
+
+    def animals_menu(self, shelter: Shelter):
+        while True:
+            print(f'{'ANIMALS':=^20}')
+            print(
+                '1. Add animal \n'
+                '2. Show list of animals \n'
+                '3. Back'
+                )
+            choice = int(input())
+            match choice:
+                case 1: # ADD
+                    animal = Animal(input('Name - '), int(input('Age - ')), input('Species - '))
+                    shelter.add_animal(animal)
+                    print(f'{animal.name} added!')
+                case 2: # SHOW LIST
+                    shelter.show_animals()
+                case 3: # BACK
+                    break
+                case _:
+                    print('Unknown command')
+
+    def employees_menu(self, shelter: Shelter):
+        while True:
+            print(f'{'EMPLOYEES':=^20}')
+            print(
+                '1. Add employee \n'
+                '2. Show list of employees \n'
+                '3. Back'
+                )
+            choice = int(input())
+            match choice:
+                case 1: # ADD
+                    employee = Employee(input('Name - '), input('Position - '))
+                    shelter.add_employee(employee)
+                    print(f'{employee.name} added!')
+                case 2: # SHOW LIST
+                    shelter.show_employees()
+                case 3: # BACK
+                    break
+                case _:
+                    print('Unknown command')
+
+    def shelter_menu(self, shelter: Shelter):
+        while True:
+            print(shelter)
+            print(
+                '1. Employees \n'
+                '2. Animals \n'
+                '3. Back'
+                )
+            choice = int(input())
+            match choice:
+                case 1: # EMPLOYEE
+                    self.employees_menu(shelter)
+                case 2: # ANIMAL
+                    self.animals_menu(shelter)
+                case 3: # BACK
+                    break
+                case _:
+                    print('Unknown command')
+
+# ==================== 
+# =====CREATE=========
+# ====================
+
+def create_shelter() -> Shelter:
+    print(
+        f'{'Welcome':=^20} \n'
+        '1. Create Shelter \n'
+        '2. Exit'
+          )
+    
+    choice = int(input())
+    match choice:
+        case 1: # CREATE
+            shelter_name = input('Name - ')
+            shelter = Shelter(shelter_name)
+            print('Shelter are created!')
+        case 2: # EXIT
+            exit()
+        case _:
+            print('Unknown command')
+
+    return shelter
+
+# ==================== 
+# =======MAIN=========
+# ====================
+
+def main():
+    Menu(create_shelter())
+
+if __name__ == '__main__':
+    main()
