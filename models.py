@@ -1,9 +1,7 @@
 from __future__ import annotations # CLASS "Animal" HAVE ARGUMENT "responsible: Employee" | BUT CLASS "Employee" BEING CREATED AFTER CLASS "Animal"
 from dataclasses import dataclass, field
 
-# ====================
-# =====ANIMAL=========
-# ====================
+from data import add_animal, get_animal
 
 @dataclass
 class Animal:
@@ -13,11 +11,16 @@ class Animal:
     age: int
     species: str
     is_hungry: bool = True
+    id: int = None
 
     responsible: Employee | None = field( 
         default=None,
         repr=False # ANIMAL HAVE RESPONSIBLE | BUT RESPONSIBLE HAVE ANIMAL LIST = RECURSION -> rep=False
         )
+
+    responsible_id: int = 0
+
+    description: str = None
 
     def __str__(self) -> str:
         is_hungry_text = "Animal fed" if not self.is_hungry else "Animal hungry"
@@ -54,10 +57,6 @@ class Animal:
         print(f"{self.name} has been fed")
         return True
 
-# ====================
-# =====EMPLOYEE=======
-# ====================
-
 @dataclass
 class Employee:
     """ ADD_ANIMAL | FEED_ALL | SHOW_ANIMALS """
@@ -68,6 +67,8 @@ class Employee:
     animals: list[Animal] = field( # LIST "animals" CAN TAKE ONLY VALUE CLASS "Animal" -> list[Animal]
         default_factory=list 
         ) 
+
+    description: str = None
 
     def __str__(self) -> str:
         return (
@@ -100,42 +101,32 @@ class Employee:
         if not self.animals:
             print("The employee doesn't have animals")
             return
-        
-        print(f"{self.name}'s animals:")
         for index, animal in enumerate(self.animals, start=1):
             print(f"{index}. {animal}")
-
-# ====================
-# =====SHELTER========
-# ====================
+        
+        print(f"{self.name}'s animals:")
         
 @dataclass
 class Shelter:
     """ ADD_ANIMAL or EMPLOYEE | FIND_ANIMAL | SHOW_ANIMALS or EMPLOYEE"""
 
     name: str
+    id: int | None = None
 
-    animals: list[Animal] = field(
-        default_factory=list, # LIST "animals" CAN TAKE ONLY VALUE CLASS "Animal" -> list[Animal]
-        repr=False # PROTECTION FOR LARGE LIST
-        ) 
-    
-    employees: list[Employee] = field(
-        default_factory=list, # LIST "employees" CAN TAKE ONLY VALUE CLASS "Employee" -> list[Employee]
-        repr=False # PROTECTION FOR LARGE LIST
-        )
+    animal_count: int = 0
+    employee_count: int = 0
 
     def __str__(self) -> str:
         # len_decore = 25+len(self.employees)+len(self.animals) | IN FUTURE FOR BIG COUNT OF ANIMAL or EMPLOYEE
         return (
                 f"{self.name:=^25} \n"
-                f"Animals: {len(self.animals)} | "
-                f"Employees: {len(self.employees)} \n"
+                f"Animals: {self.animal_count} | "
+                f"Employees: {self.employee_count} \n"
                 f"{"="*25}"
                 )
 
     def add_animal(self, animal: Animal) -> None:
-        self.animals.append(animal)
+        add_animal(animal)
 
     def add_employee(self, employee) -> None:
         self.employees.append(employee)

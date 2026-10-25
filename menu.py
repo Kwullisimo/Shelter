@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from models import Animal, Employee, Shelter
+# from data import get_table
 
 # ==================== 
 # ======MENU==========
@@ -20,7 +21,8 @@ class Menu():
             print(
                 f"{"MENU":=^20} \n"
                 "1. My shelter \n"
-                "2. Exit"
+                "2. Exit\n"
+                "3. database"
                 )
 
             try:
@@ -30,6 +32,8 @@ class Menu():
                         self.shelter_menu(shelter)
                     case 2: # EXIT
                         exit()
+                    case 3: 
+                        print("pososi")
                     case _:
                         print("Unknown command")
             except ValueError:

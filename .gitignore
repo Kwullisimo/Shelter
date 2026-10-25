@@ -1,5 +1,5 @@
-# Database
-shelter.db
-database.py
+.venv
 
 __pycache__/
+
+database.db
