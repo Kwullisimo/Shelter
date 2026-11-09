@@ -1,7 +1,5 @@
 from .database import db
 
-from models import Shelter
-
 def get_shelter():
     cursor = db.execute("""
         SELECT id, name FROM shelters
@@ -15,14 +13,13 @@ def save_shelter(shelter):
         cursor = db.execute("""
             INSERT INTO shelters (name)
             VALUES (?)
-        """, (shelter.name,))
+        """, (shelter.name))
 
     return cursor.lastrowid
 
-def rename_shelter(new_name: str, shelter: Shelter) -> None:
+def rename_shelter(new_name: str, shelter) -> None:
     with db:
-        db.execute(
-            """"
+        db.execute("""
             UPDATE shelters SET name = ? WHERE id = ?
             """,
             (new_name, shelter.id)

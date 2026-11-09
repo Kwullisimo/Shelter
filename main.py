@@ -1,8 +1,9 @@
-from menu import create_shelter, Menu
 from models import Shelter
 
+from menu import main_menu
+
 from data import init_db, close_db
-from data.shelters import get_shelter, save_shelter
+from data import get_shelter, save_shelter
 
 
 def main():
@@ -12,7 +13,7 @@ def main():
         shelter_data = get_shelter()
 
         if shelter_data is None:
-            shelter = create_shelter()
+            shelter = main_menu.create_shelter()
             shelter.id = save_shelter(shelter)
         else:
             shelter = Shelter(
@@ -20,7 +21,7 @@ def main():
                 id=shelter_data[0]
             )
 
-        Menu(shelter).run()
+        main_menu.run(shelter)
 
     finally:
         close_db()

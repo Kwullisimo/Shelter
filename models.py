@@ -1,7 +1,11 @@
 from __future__ import annotations # CLASS "Animal" HAVE ARGUMENT "responsible: Employee" | BUT CLASS "Employee" BEING CREATED AFTER CLASS "Animal"
 from dataclasses import dataclass, field
 
-from data import add_animal, get_animal
+import data
+
+from data import get_shelter
+from data import get_animal
+from data import get_employee
 
 @dataclass
 class Animal:
@@ -10,6 +14,8 @@ class Animal:
     name: str
     age: int
     species: str
+    description: str = None
+
     is_hungry: bool = True
     id: int = None
 
@@ -20,7 +26,6 @@ class Animal:
 
     responsible_id: int = 0
 
-    description: str = None
 
     def __str__(self) -> str:
         is_hungry_text = "Animal fed" if not self.is_hungry else "Animal hungry"
@@ -64,11 +69,11 @@ class Employee:
     name: str
     position: str
 
+    description: str = None
+
     animals: list[Animal] = field( # LIST "animals" CAN TAKE ONLY VALUE CLASS "Animal" -> list[Animal]
         default_factory=list 
         ) 
-
-    description: str = None
 
     def __str__(self) -> str:
         return (
@@ -113,24 +118,15 @@ class Shelter:
     name: str
     id: int | None = None
 
-    animal_count: int = 0
-    employee_count: int = 0
-
     def __str__(self) -> str:
         # len_decore = 25+len(self.employees)+len(self.animals) | IN FUTURE FOR BIG COUNT OF ANIMAL or EMPLOYEE
         return (
                 f"{self.name:=^25} \n"
-                f"Animals: {self.animal_count} | "
-                f"Employees: {self.employee_count} \n"
+                f"Animals: {len(get_animal())} | "
+                f"Employees: {len(get_employee())} \n"
                 f"{"="*25}"
                 )
-
-    def add_animal(self, animal: Animal) -> None:
-        add_animal(animal)
-
-    def add_employee(self, employee) -> None:
-        self.employees.append(employee)
-
+    
     def find_animal(self, name: str) -> bool: # SUCCESSFUL -> "True" | FAILED -> "False"
         found = False
     
@@ -144,20 +140,3 @@ class Shelter:
 
         return found
             
-    def show_animals(self) -> None: # EARLY RETURN ⬇
-        if not self.animals:
-            print(f"There are no animals at the {self.name}")
-            return 
-
-        print(f"{self.name} animals:")
-        for index, animal in enumerate(self.animals, start=1):
-            print(f"{index}. {animal}")
-
-    def show_employees(self) -> None: # EARLY RETURN ⬇
-        if not self.employees:
-            print(f"There are no staff at the {self.name}")
-            return 
-      
-        print(f"{self.name} employees:")
-        for index, employee in enumerate(self.employees, start=1):
-            print(f"{index}. {employee}")
